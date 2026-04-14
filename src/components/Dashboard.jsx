@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import IngestionTerminal from './IngestionTerminal';
 import IntelligenceGrid from './IntelligenceGrid';
 import AnomalyRadar from './AnomalyRadar';
@@ -63,6 +64,17 @@ const styles = {
 };
 
 export default function Dashboard() {
+  const [intelData, setIntelData] = useState(null);
+  const [anomalyData, setAnomalyData] = useState(null);
+
+  const handleProcessingComplete = (payload) => {
+    setIntelData({
+      metrics: payload.metrics,
+      sentimentData: payload.sentimentData,
+    });
+    setAnomalyData(payload.anomalies);
+  };
+
   return (
     <div style={styles.root}>
       <style>{`
@@ -89,10 +101,13 @@ export default function Dashboard() {
 
       <main style={styles.main}>
         <div style={styles.fullWidth}>
-          <IngestionTerminal />
+          <IngestionTerminal onProcessingComplete={handleProcessingComplete} />
         </div>
-        <IntelligenceGrid />
-        <AnomalyRadar />
+        <IntelligenceGrid
+          metrics={intelData?.metrics}
+          sentimentData={intelData?.sentimentData}
+        />
+        <AnomalyRadar chartData={anomalyData?.chartData} />
       </main>
     </div>
   );

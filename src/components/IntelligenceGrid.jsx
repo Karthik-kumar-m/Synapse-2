@@ -10,7 +10,7 @@ const COLORS = {
   green: '#39FF14',
 };
 
-const SENTIMENT_DATA = [
+const DEFAULT_SENTIMENT_DATA = [
   {
     feature: 'BATTERY',
     positive: 68,
@@ -55,7 +55,7 @@ const SENTIMENT_DATA = [
   },
 ];
 
-const METRICS = [
+const DEFAULT_METRICS = [
   { label: 'TOTAL REVIEWS', value: '42,871', accent: COLORS.cyan, icon: '◈' },
   { label: 'AVG RATING', value: '3.64 ★', accent: COLORS.yellow, icon: '◉' },
   { label: 'VERIFIED PURCHASES', value: '31,204', accent: COLORS.green, icon: '✓' },
@@ -228,7 +228,7 @@ function FeatureCard({ feature, positive, negative, neutral, total }) {
   );
 }
 
-export default function IntelligenceGrid() {
+export default function IntelligenceGrid({ metrics = DEFAULT_METRICS, sentimentData = DEFAULT_SENTIMENT_DATA }) {
   return (
     <div style={styles.wrapper}>
       <div style={styles.panelHeader}>
@@ -236,7 +236,7 @@ export default function IntelligenceGrid() {
       </div>
 
       <div style={styles.metricsRow}>
-        {METRICS.map((m, i) => (
+        {metrics.map((m, i) => (
           <div key={i} style={styles.metricCard(m.accent, m.threat)}>
             <div style={styles.metricAccentBar(m.accent)}></div>
             <span style={styles.metricIcon(m.accent)}>{m.icon}</span>
@@ -250,7 +250,7 @@ export default function IntelligenceGrid() {
       <div style={styles.sentimentSection}>
         <div style={styles.sectionTitle}>// Sentiment Breakdown by Feature</div>
         <div style={styles.featureGrid}>
-          {SENTIMENT_DATA.map((d, i) => (
+          {sentimentData.map((d, i) => (
             <FeatureCard key={i} {...d} />
           ))}
         </div>
