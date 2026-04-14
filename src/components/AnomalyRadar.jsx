@@ -143,18 +143,31 @@ const styles = {
   },
 };
 
-export default function AnomalyRadar() {
+export default function AnomalyRadar({ chartData = CHART_DATA, threshold = ANOMALY_THRESHOLD }) {
   const [dismissed, setDismissed] = useState(false);
 
-  const maxPackaging = Math.max(...CHART_DATA.map((d) => d.packagingComplaints));
-  const spikeDetected = maxPackaging > ANOMALY_THRESHOLD;
-  const spikePoint = CHART_DATA.find((d) => d.packagingComplaints === maxPackaging);
+  if (!chartData.length) {
+    return (
+      <div style={styles.wrapper}>
+        <div style={styles.panelHeader}>
+          <span>⚠ ANOMALY RADAR</span>
+        </div>
+        <div style={{ padding: '16px', color: COLORS.dim, fontFamily: "'Space Mono', monospace" }}>
+          // Upload a CSV to generate anomaly telemetry.
+        </div>
+      </div>
+    );
+  }
+
+  const maxPackaging = Math.max(...chartData.map((d) => d.packagingComplaints));
+  const spikeDetected = maxPackaging > threshold;
+  const spikePoint = chartData.find((d) => d.packagingComplaints === maxPackaging);
 
   return (
     <div style={styles.wrapper}>
       <div style={styles.panelHeader}>
         <span>⚠ ANOMALY RADAR</span>
-        <button style={styles.exportBtn} onClick={() => exportCSV(CHART_DATA)}>
+        <button style={styles.exportBtn} onClick={() => exportCSV(chartData)}>
           ↓ EXPORT CSV
         </button>
       </div>
@@ -167,7 +180,7 @@ export default function AnomalyRadar() {
               ANOMALY DETECTED — {spikePoint?.batch}: Packaging Complaints at {maxPackaging}%
             </span>
             <span style={styles.alertSub}>
-              THRESHOLD EXCEEDED BY {(maxPackaging - ANOMALY_THRESHOLD).toFixed(1)} PERCENTAGE POINTS ·
+              THRESHOLD EXCEEDED BY {(maxPackaging - threshold).toFixed(1)} PERCENTAGE POINTS ·
               ESCALATION RECOMMENDED
             </span>
           </div>
@@ -191,7 +204,7 @@ export default function AnomalyRadar() {
 
       <div style={styles.chartArea}>
         <ResponsiveContainer width="100%" height={280}>
-          <LineChart data={CHART_DATA} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
+          <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
             <CartesianGrid stroke={COLORS.gridLine} strokeDasharray="0" vertical={false} />
             <XAxis
               dataKey="batch"
@@ -216,11 +229,11 @@ export default function AnomalyRadar() {
               }}
             />
             <ReferenceLine
-              y={ANOMALY_THRESHOLD}
+              y={threshold}
               stroke={COLORS.yellow}
               strokeDasharray="4 4"
               label={{
-                value: `THRESHOLD ${ANOMALY_THRESHOLD}%`,
+                value: `THRESHOLD ${threshold}%`,
                 position: 'insideTopRight',
                 style: styles.thresholdLabel,
               }}
